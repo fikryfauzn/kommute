@@ -63,7 +63,7 @@ func GetArrivals(ctx context.Context, pool *pgxpool.Pool, stationID string, curr
 		       TO_CHAR(st.dest_time, 'HH24:MI:SS'),
 		       l.ka_name, l.color,
 		       ts.name AS dest_name,
-		       vs.name AS via_name
+		       vs.code AS via_name
 		FROM stop_times st
 		JOIN lines l ON l.id = st.line_id
 		JOIN dest_map dm ON dm.raw_dest = st.raw_dest
