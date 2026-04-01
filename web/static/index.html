@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>kommute</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=2">
 </head>
 <body>
   <header>
@@ -14,24 +14,20 @@
 
   <main>
     <section id="picker">
-      <select id="line-select">
-        <option value="">-- pick line --</option>
-      </select>
-      <select id="station-select" disabled>
-        <option value="">-- pick station --</option>
-      </select>
-      <button id="go-btn" disabled>show arrivals</button>
+      <input type="text" id="search" placeholder="search station" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div id="recents"></div>
+      <div id="results"></div>
     </section>
 
     <section id="board" hidden>
       <div id="board-header">
+        <button id="back-btn" aria-label="Back">&#8592;</button>
         <h2 id="station-name"></h2>
-        <button id="back-btn">back</button>
       </div>
       <div id="arrivals"></div>
     </section>
   </main>
 
-  <script src="/js/app.js"></script>
+  <script src="/js/app.js?v=2"></script>
 </body>
 </html>
