@@ -1,0 +1,44 @@
+[Unit]
+Description=kommute KRL arrival board
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=kommute
+Group=kommute
+WorkingDirectory=/opt/kommute
+ExecStart=/opt/kommute/kommute
+EnvironmentFile=/opt/kommute/.env
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+
+# Resource limits
+LimitNOFILE=65535
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kommute
+
+[Install]
+WantedBy=multi-user.target
