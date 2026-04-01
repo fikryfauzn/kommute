@@ -1,0 +1,164 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0a;
+  color: #f0c040;
+  font-family: 'Courier New', Courier, monospace;
+  min-height: 100dvh;
+  padding: 16px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 28px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #888;
+  letter-spacing: 2px;
+}
+
+/* picker */
+#picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+select, button {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  background: #1a1a1a;
+  color: #f0c040;
+  border: 1px solid #333;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+select:disabled {
+  color: #555;
+}
+
+button {
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 13px;
+}
+
+button:disabled {
+  color: #555;
+  cursor: default;
+}
+
+button:not(:disabled):active {
+  background: #333;
+}
+
+/* board */
+#board {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+#board-header h2 {
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+#back-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  border: 1px solid #555;
+}
+
+/* arrival rows */
+.arrival-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #111;
+  border: 1px solid #222;
+  margin-bottom: 6px;
+}
+
+.arrival-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.line-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.arrival-dest {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.train-time {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.countdown {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.countdown.soon {
+  color: #ff4444;
+}
+
+.countdown.arriving {
+  color: #44ff44;
+  animation: blink 1s step-end infinite;
+}
+
+.abs-time {
+  font-size: 11px;
+  color: #888;
+}
+
+@keyframes blink {
+  50% { opacity: 0.3; }
+}
+
+.no-data {
+  text-align: center;
+  color: #555;
+  padding: 40px 0;
+  font-size: 14px;
+}

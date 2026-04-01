@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kommute</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>kommute</h1>
+    <p class="subtitle">KRL Jabodetabek</p>
+  </header>
+
+  <main>
+    <section id="picker">
+      <select id="line-select">
+        <option value="">-- pick line --</option>
+      </select>
+      <select id="station-select" disabled>
+        <option value="">-- pick station --</option>
+      </select>
+      <button id="go-btn" disabled>show arrivals</button>
+    </section>
+
+    <section id="board" hidden>
+      <div id="board-header">
+        <h2 id="station-name"></h2>
+        <button id="back-btn">back</button>
+      </div>
+      <div id="arrivals"></div>
+    </section>
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
