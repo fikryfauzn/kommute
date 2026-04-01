@@ -58,7 +58,9 @@ func GetStationsByLine(ctx context.Context, pool *pgxpool.Pool) ([]model.Line, e
 
 func GetArrivals(ctx context.Context, pool *pgxpool.Pool, stationID string, currentSort int) ([]model.Arrival, error) {
 	query := `
-		SELECT st.train_id, st.arrival_time, st.dest_time,
+		SELECT st.train_id,
+		       TO_CHAR(st.arrival_time, 'HH24:MI:SS'),
+		       TO_CHAR(st.dest_time, 'HH24:MI:SS'),
 		       l.ka_name, l.color,
 		       ts.name AS dest_name,
 		       vs.name AS via_name
@@ -109,7 +111,7 @@ func GetArrivalsGrouped(ctx context.Context, pool *pgxpool.Pool, stationID strin
 		  ) AS rn
 		  FROM stop_times
 		  WHERE station_id = $1
-		    AND arrival_sort = $2
+		    AND arrival_sort > $2
 		) st
 		JOIN lines l ON l.id = st.line_id
 		JOIN dest_map dm ON dm.raw_dest = st.raw_dest
@@ -165,8 +167,9 @@ func GetArrivalsGrouped(ctx context.Context, pool *pgxpool.Pool, stationID strin
 
 func GetTrips(ctx context.Context, pool *pgxpool.Pool, fromID, toID string, currentSort int) ([]model.Trip, error) {
 	query := `
-		SELECT a.train_id, a.arrival_time AS depart_time,
-		       b.arrival_time AS arrive_time,
+		SELECT a.train_id,
+		       TO_CHAR(a.arrival_time, 'HH24:MI:SS') AS depart_time,
+		       TO_CHAR(b.arrival_time, 'HH24:MI:SS') AS arrive_time,
 		       b.arrival_sort - a.arrival_sort AS travel_minutes,
 		       l.ka_name, l.color,
 		       ds.name AS destination
