@@ -239,7 +239,7 @@ INSERT INTO station_lines (station_id, line_id) VALUES
 -- ============================================================
 
 INSERT INTO dest_map (raw_dest, terminal_station_id, via_station_id) VALUES
-    ('ANGKE',                    'AK',   NULL),
+    ('ANGKE',                    'AK',   'MRI'),
     ('ANGKE VIA MRI',            'AK',   'MRI'),
     ('BEKASI',                   'BKS',  NULL),
     ('BEKASI VIA MRI',           'BKS',  'MRI'),

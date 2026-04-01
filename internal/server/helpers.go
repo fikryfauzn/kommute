@@ -66,7 +66,7 @@ func toArrivalSort(hour, min int) int {
 }
 
 func currentSort() int {
-	now := time.Now()
+	now := time.Now().Add(-3 * time.Minute)
 	return toArrivalSort(now.Hour(), now.Minute())
 }
 
