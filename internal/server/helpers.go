@@ -15,7 +15,7 @@ var stationCodeRe = regexp.MustCompile(`^[A-Z]{2,6}$`)
 type ctxKey int
 
 const (
-	ctxKeyLogger    ctxKey = iota
+	ctxKeyLogger ctxKey = iota
 	ctxKeyRequestID
 )
 

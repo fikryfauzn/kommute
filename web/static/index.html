@@ -2,32 +2,87 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>kommute</title>
-  <link rel="stylesheet" href="/css/style.css?v=2">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ecece8">
+  <title>Kommute — KRL Jabodetabek</title>
+  <link rel="preload" as="font" type="font/otf" crossorigin href="/font/helvetica-neue-5/HelveticaNeueBlack.otf">
+  <link rel="preload" as="font" type="font/otf" crossorigin href="/font/helvetica-neue-5/HelveticaNeueBold.otf">
+  <link rel="stylesheet" href="/css/style.css?v=7">
 </head>
+
 <body>
-  <header>
-    <h1>kommute</h1>
-    <p class="subtitle">KRL Jabodetabek</p>
-  </header>
+  <div class="app-shell">
+    <main class="app">
 
-  <main>
-    <section id="picker">
-      <input type="text" id="search" placeholder="search station" autocomplete="off" autocorrect="off" spellcheck="false">
-      <div id="recents"></div>
-      <div id="results"></div>
-    </section>
+      <!-- Station picker -->
+      <section id="picker" class="screen">
+        <header class="home-header gutter">
+          <div>
+            <h1 class="brand">KOMMUTE</h1>
+            <p class="brand-subtitle">KRL JABODETABEK</p>
+          </div>
+          <time id="home-clock" class="header-clock" aria-label="Jakarta time">--:--</time>
+        </header>
 
-    <section id="board" hidden>
-      <div id="board-header">
-        <button id="back-btn" aria-label="Back">&#8592;</button>
-        <h2 id="station-name"></h2>
-      </div>
-      <div id="arrivals"></div>
-    </section>
-  </main>
+        <div class="major-rule"></div>
 
-  <script src="/js/app.js?v=2"></script>
+        <div class="search-wrap gutter">
+          <label class="sr-only" for="search">Search station</label>
+          <input
+            type="search"
+            id="search"
+            placeholder="SEARCH STATION"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+          >
+        </div>
+
+        <div id="recents" class="recents gutter"></div>
+
+        <h2 id="station-list-label" class="section-label gutter">ALL STATIONS</h2>
+
+        <div id="results" class="station-list" aria-live="polite"></div>
+      </section>
+
+      <!-- Departure board -->
+      <section id="board" class="screen" hidden>
+        <header class="board-header gutter">
+          <button id="back-btn" class="back-button" type="button">
+            <svg class="back-arrow" viewBox="0 0 17 10" fill="none" stroke="currentColor"
+                 stroke-width="1.1" aria-hidden="true">
+              <path d="M17 5H1M5.5 .8 1 5l4.5 4.2"/>
+            </svg>
+            <span class="back-label">STATIONS</span>
+          </button>
+
+          <h2 id="station-name" class="station-title">STATION</h2>
+          <div id="station-lines" class="badges"></div>
+
+          <p class="board-subtitle">
+            Next departures as of <time id="board-clock">--:--</time>
+          </p>
+        </header>
+
+        <div class="major-rule"></div>
+
+        <div class="arrival-grid board-columns" aria-hidden="true">
+          <span>LINE</span>
+          <span>DESTINATION</span>
+          <span>DEPARTS</span>
+        </div>
+
+        <div id="arrivals" class="arrival-list" aria-live="polite"></div>
+
+        <footer class="board-footer gutter">
+          Scheduled times — actual arrivals may differ
+        </footer>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/js/app.js?v=8"></script>
 </body>
 </html>

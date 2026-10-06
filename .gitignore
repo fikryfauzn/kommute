@@ -2,3 +2,10 @@ bin/
 .env
 *.exe
 *.exe~
+
+# Generated KCI source snapshots
+data/kci/raw/
+data/kci/raw.tmp/
+
+# Local font assets
+web/static/font/

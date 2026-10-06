@@ -1,246 +1,652 @@
-* {
-  margin: 0;
-  padding: 0;
+/* ==========================================================
+   FONT: Helvetica Neue
+   Served from web/static/font/helvetica-neue-5/
+   ========================================================== */
+
+@font-face { font-family: "Helvetica Neue"; font-weight: 300; font-display: swap;
+  src: url("/font/helvetica-neue-5/HelveticaNeueLight.otf") format("opentype"); }
+@font-face { font-family: "Helvetica Neue"; font-weight: 400; font-display: swap;
+  src: url("/font/helvetica-neue-5/HelveticaNeueRoman.otf") format("opentype"); }
+@font-face { font-family: "Helvetica Neue"; font-weight: 500; font-display: swap;
+  src: url("/font/helvetica-neue-5/HelveticaNeueMedium.otf") format("opentype"); }
+@font-face { font-family: "Helvetica Neue"; font-weight: 700; font-display: swap;
+  src: url("/font/helvetica-neue-5/HelveticaNeueBold.otf") format("opentype"); }
+@font-face { font-family: "Helvetica Neue"; font-weight: 800; font-display: swap;
+  src: url("/font/helvetica-neue-5/HelveticaNeueHeavy.otf") format("opentype"); }
+@font-face { font-family: "Helvetica Neue"; font-weight: 900; font-display: swap;
+  src: url("/font/helvetica-neue-5/HelveticaNeueBlack.otf") format("opentype"); }
+
+
+/* ==========================================================
+   TOKENS
+   The design is drawn on a 390px-wide phone, where 1 unit = 1px.
+   --u scales that drawing with the viewport (floor 0.9, cap 1.75),
+   so every size keeps its proportion on every screen.
+   Write sizes as calc(N * var(--u)).
+   ========================================================== */
+
+:root {
+  --u: clamp(0.9px, calc(100vw / 390), 1.75px);
+
+  --page: #ecece8;
+  --paper: #ffffff;
+  --row: #f8f8f5;
+
+  --ink: #0d0d0c;
+  --muted: #74746f;
+  --muted-dark: #55554f;
+  --faint: #8a8984;
+
+  --rule: #d6d6d2;
+  --rule-heavy: #11110f;
+
+  --rail-color: #dd3434;
+  --urgent: #d93232;
+  --soon: #2f8a1f;
+
+  /* layout */
+  --max-width: 740px;
+  --rail: calc(5 * var(--u));
+  --gutter: calc(20 * var(--u));
+  --col-gap: calc(12 * var(--u));
+
+  /* line badges */
+  --badge: calc(25 * var(--u));
+  --badge-gap: calc(6 * var(--u));
+  --badge-col: calc(var(--badge) * 2.4);
+
+  /* type */
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --w-dest: 700;
+}
+
+
+/* ==========================================================
+   BASE
+   ========================================================== */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
+html {
+  background: var(--page);
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: #0a0a0a;
-  color: #f0c040;
-  font-family: 'Courier New', Courier, monospace;
+  margin: 0;
   min-height: 100dvh;
-  padding: 16px;
+
+  /* keep content clear of notches in landscape (viewport-fit=cover) */
+  padding-inline:
+    env(safe-area-inset-left, 0px)
+    env(safe-area-inset-right, 0px);
+
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font);
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
 }
 
-header {
-  text-align: center;
-  margin-bottom: 24px;
+button,
+input {
+  font: inherit;
 }
 
-h1 {
-  font-size: 28px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
+button {
+  color: inherit;
 }
 
-.subtitle {
-  font-size: 12px;
-  color: #888;
-  letter-spacing: 2px;
+h1,
+h2,
+p {
+  margin: 0;
 }
 
-/* picker */
-#picker {
-  max-width: 500px;
-  margin: 0 auto;
+[hidden] {
+  display: none !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* Trim every text box to cap-height / baseline. Centring then follows
+   the actual letter shapes instead of the font's built-in ascent and
+   descent, which is what made badges and labels sit a few px off. */
+.brand, .brand-subtitle, .header-clock, .section-label,
+.result-name, .back-label, .station-title, .board-subtitle,
+.board-columns span, .arrival-dest, .arrival-via,
+.countdown, .abs-time, .board-footer, .no-data, .line-letter {
+  text-box: trim-both cap alphabetic;
+}
+
+
+/* ==========================================================
+   FRAME
+   The red rail is the shell's own left border: full height,
+   no fixed positioning, no extra element.
+   ========================================================== */
+
+.app-shell {
+  width: min(100%, var(--max-width));
+  min-height: 100dvh;
+  margin-inline: auto;
+
+  background: var(--paper);
+  border-left: var(--rail) solid var(--rail-color);
+}
+
+/* Column so the board footer can sit at the bottom of the screen. */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* The only place horizontal page padding is defined. */
+.gutter {
+  padding-inline: var(--gutter);
+}
+
+.major-rule {
+  height: calc(3 * var(--u));
+  margin-inline: var(--gutter);
+  background: var(--rule-heavy);
+}
+
+
+/* ==========================================================
+   LINE BADGES
+   ========================================================== */
+
+.line-circle {
+  display: inline-grid;
+  place-items: center;
+
+  flex: none;
+  width: var(--badge);
+  height: var(--badge);
+
+  border-radius: 50%;
+  color: #fff;
+
+  font-size: calc(var(--badge) * 0.46);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+}
+
+.badges > * + * {
+  margin-left: var(--badge-gap);
+}
+
+/* 3+ lines: overlap so the group never outgrows --badge-col.
+   --n (badge count) is set from JS. */
+.badges[data-dense] > * + * {
+  margin-left: calc(
+    (var(--badge-col) - var(--badge)) / (var(--n) - 1) - var(--badge)
+  );
+}
+
+.badges[data-dense] .line-circle {
+  box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--paper);
+}
+
+
+/* ==========================================================
+   HOME
+   ========================================================== */
+
+.home-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--col-gap);
+
+  padding-block: calc(40 * var(--u)) calc(24 * var(--u));
+}
+
+.brand {
+  font-size: calc(32 * var(--u));
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.brand-subtitle {
+  margin-top: calc(12 * var(--u));
+
+  color: var(--muted-dark);
+  font-size: calc(11 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.3em;
+}
+
+.header-clock {
+  color: var(--muted-dark);
+  font-size: calc(14 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ==========================================================
+   SEARCH + RECENTS
+   ========================================================== */
+
+.search-wrap {
+  margin-top: calc(24 * var(--u));
 }
 
 #search {
+  appearance: none;
+
   width: 100%;
-  min-height: 48px;
-  padding: 12px 16px;
-  font-family: inherit;
-  font-size: 16px;
-  background: #111;
-  color: #f0c040;
-  border: 1px solid #333;
-  border-radius: 4px;
+  height: calc(52 * var(--u));
+  padding-inline: calc(18 * var(--u));
+
+  border: 2px solid #deded9;
+  border-radius: 0;
   outline: none;
+
+  background: #fafaf8;
+  color: var(--ink);
+
+  /* never below 16px, or iOS zooms the page on focus */
+  font-size: max(16px, calc(14 * var(--u)));
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 #search::placeholder {
-  color: #555;
+  color: var(--faint);
+  opacity: 1;
 }
 
 #search:focus {
-  border-color: #f0c040;
+  border-color: var(--ink);
+  background: var(--paper);
 }
 
-/* recents */
-#recents {
+.recents {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
   flex-wrap: wrap;
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.recents:empty {
+  display: none;
 }
 
 .recent-chip {
-  padding: 8px 14px;
-  min-height: 40px;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 20px;
-  color: #f0c040;
-  font-family: inherit;
-  font-size: 13px;
+  min-height: 36px;
+  padding: 0 14px;
+
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+
+  background: var(--paper);
+  color: var(--muted-dark);
+
+  font-size: calc(10 * var(--u));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
   cursor: pointer;
-  display: flex;
-  align-items: center;
 }
 
 .recent-chip:active {
-  background: #333;
+  transform: translateY(1px);
 }
 
-/* search results */
-#results {
-  margin-top: 8px;
+.section-label {
+  margin-block: calc(28 * var(--u)) calc(10 * var(--u));
+
+  color: var(--faint);
+  font-size: calc(10 * var(--u));
+  font-weight: 800;
+  letter-spacing: 0.35em;
 }
+
+
+/* ==========================================================
+   STATION LIST
+   columns: [badges] [name] [chevron]
+   ========================================================== */
 
 .result-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--badge-col) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 8px 16px;
+  column-gap: var(--col-gap);
+
+  min-height: calc(64 * var(--u));
+  padding: calc(10 * var(--u)) var(--gutter);
+
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .result-row:active {
-  background: #1a1a1a;
+  background: #eeeeea;
 }
 
-.result-circles {
-  display: flex;
-  gap: 4px;
-  flex-shrink: 0;
+.result-row .badges {
+  width: var(--badge-col);
 }
 
 .result-name {
-  font-size: 16px;
+  overflow-wrap: anywhere;
+
+  font-size: calc(15 * var(--u));
+  font-weight: var(--w-dest);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
 }
 
-/* line circle */
-.line-circle {
+.result-arrow {
+  display: block;
+  width: calc(7 * var(--u));
+  height: calc(12 * var(--u));
+  color: var(--faint);
+}
+
+
+/* ==========================================================
+   BOARD HEADER
+   ========================================================== */
+
+.board-header {
+  /* back-button centre sits 31.6 units from the top (44px touch target) */
+  padding-block:
+    max(4px, calc(31.6 * var(--u) - 22px))
+    calc(18 * var(--u));
+}
+
+.back-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-weight: 700;
-  flex-shrink: 0;
-}
+  gap: calc(11 * var(--u));
 
-.line-circle--lg {
-  width: 28px;
-  height: 28px;
-  font-size: 14px;
-}
-
-.line-circle--sm {
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
-}
-
-/* board */
-#board {
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-#board-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-#back-btn {
-  min-width: 48px;
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: #f0c040;
-  font-size: 24px;
-  cursor: pointer;
+  min-height: 44px;
+  /* title cap-top lands 59.5 units from the top */
+  margin: 0 0 max(0px, calc(27.9 * var(--u) - 22px));
   padding: 0;
-}
 
-#back-btn:active {
-  color: #fff;
-}
+  border: 0;
+  background: transparent;
+  color: var(--muted-dark);
 
-#board-header h2 {
-  font-size: 22px;
-  letter-spacing: 2px;
+  font-size: calc(11 * var(--u));
   font-weight: 700;
+  letter-spacing: 0.2em;
+
+  cursor: pointer;
 }
 
-/* arrival rows */
+.back-arrow {
+  display: block;
+  flex: none;
+  width: calc(17 * var(--u));
+  height: calc(10 * var(--u));
+}
+
+.station-title {
+  font-size: calc(26 * var(--u));
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.board-header .badges {
+  gap: var(--badge-gap);
+  margin-top: calc(10 * var(--u));
+}
+
+.board-header .badges > * + * {
+  margin-left: 0;
+}
+
+/* ---- line filter toggles ---- */
+
+.line-toggle {
+  position: relative;
+  display: block;
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+  background: none;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* grow the hit area to ~44px without changing the layout */
+.line-toggle::after {
+  content: "";
+  position: absolute;
+  inset: -9px -3px;
+}
+
+.line-toggle .line-circle {
+  transition: opacity 150ms ease, filter 150ms ease, box-shadow 150ms ease;
+}
+
+/* a filter is active: unselected lines go grey, selected gets a ring */
+.badges[data-filtering] .line-toggle[aria-pressed="false"] .line-circle {
+  filter: grayscale(1);
+  opacity: 0.3;
+}
+
+.line-toggle[aria-pressed="true"] .line-circle {
+  box-shadow:
+    0 0 0 calc(1.5 * var(--u)) var(--paper),
+    0 0 0 calc(3 * var(--u)) var(--ink);
+}
+
+.line-toggle:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: calc(2 * var(--u));
+}
+
+.board-subtitle {
+  margin-top: calc(6 * var(--u));
+
+  color: var(--muted-dark);
+  font-size: calc(12 * var(--u));
+  letter-spacing: 0.04em;
+}
+
+#board-clock {
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ==========================================================
+   DEPARTURES
+   One column template shared by the table head and every row:
+   [badge] [destination / via] [countdown / clock time]
+   ========================================================== */
+
+.arrival-grid {
+  display: grid;
+  grid-template-columns: var(--badge) minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--col-gap);
+
+  padding-inline: var(--gutter);
+}
+
+.board-columns {
+  min-height: calc(30 * var(--u));
+
+  border-bottom: 1px solid var(--rule);
+  background: var(--row);
+  color: var(--faint);
+
+  font-size: calc(10 * var(--u));
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  white-space: nowrap;
+}
+
+.board-columns span:last-child {
+  text-align: right;
+  margin-right: -0.25em; /* cancel trailing letter-spacing: flush right edge */
+}
+
 .arrival-row {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  min-height: 64px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: calc(72 * var(--u));
+  padding-block: calc(10 * var(--u));
+
+  border-bottom: 1px solid var(--rule);
+  background: var(--row);
 }
 
-.arrival-left {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.arrival-line1 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* alternating rows, as in the original design */
+.arrival-row:nth-child(even) {
+  background: var(--paper);
 }
 
 .arrival-dest {
-  font-size: 18px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+
+  font-size: calc(15 * var(--u));
+  font-weight: var(--w-dest);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
 }
 
 .arrival-via {
-  font-size: 12px;
-  color: #666;
-  padding-left: 32px;
+  margin-top: calc(6 * var(--u));
+
+  color: var(--muted);
+  font-size: calc(10 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
 .arrival-right {
   text-align: right;
-  flex-shrink: 0;
-  margin-left: 12px;
 }
 
 .countdown {
-  font-size: 20px;
-  font-weight: 700;
+  color: var(--ink);
+  font-size: calc(23 * var(--u));
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown.urgent {
+  color: var(--urgent);
 }
 
 .countdown.soon {
-  color: #ff4444;
-}
-
-.countdown.arriving {
-  color: #44ff44;
-  animation: blink 1s step-end infinite;
+  color: var(--soon);
 }
 
 .abs-time {
-  font-size: 14px;
-  color: #888;
+  margin-top: calc(9 * var(--u));
+  margin-right: -0.05em;
+
+  color: var(--faint);
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
 }
 
-@keyframes blink {
-  50% { opacity: 0.3; }
-}
+
+/* ==========================================================
+   STATES + FOOTER
+   ========================================================== */
 
 .no-data {
+  padding: calc(40 * var(--u)) var(--gutter);
+
+  border-bottom: 1px solid var(--rule);
+  background: var(--row);
+  color: var(--muted);
+
   text-align: center;
-  color: #555;
-  padding: 40px 0;
-  font-size: 14px;
+  font-size: calc(12 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.board-footer {
+  margin-top: auto;
+  padding-block: calc(14 * var(--u));
+
+  border-top: 1px solid var(--rule);
+  background: var(--row);
+  color: var(--faint);
+
+  font-size: calc(11 * var(--u));
+  letter-spacing: 0.05em;
+}
+
+
+/* ==========================================================
+   INTERACTION + DESKTOP
+   ========================================================== */
+
+@media (hover: hover) {
+  .result-row:hover {
+    background: #f6f6f2;
+  }
+
+  .recent-chip:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .back-button:hover {
+    color: var(--ink);
+  }
+}
+
+@media (min-width: 741px) {
+  .app-shell {
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.06),
+      0 24px 70px rgba(0, 0, 0, 0.08);
+  }
 }
