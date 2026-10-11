@@ -620,6 +620,12 @@ def main():
                         via_raw
                     )
 
+            # All unqualified KAMPUNGBANDAN services in the current
+            # verified timetable run through Manggarai. Preserve the
+            # routing label when the KCI board omits the VIA suffix.
+            if raw_dest == "KAMPUNGBANDAN" and via_code is None:
+                via_code = "MRI"
+
             metadata = {
                 "line": line,
                 "color": canonical_color,
@@ -978,6 +984,17 @@ def main():
                 f"but station schedules say "
                 f"{metadata['destination_time']}"
             )
+
+        # Don't silently mislabel a future KCI timetable if the
+        # unqualified route ever stops running through Manggarai.
+        if metadata["destination"] == "KAMPUNGBANDAN":
+            via_stops = {stop["station"] for stop in stops}
+            if "MRI" not in via_stops or "PSE" in via_stops:
+                raise RuntimeError(
+                    f"{train_id}: unqualified Kampung Bandan route "
+                    "is no longer exclusively via Manggarai; "
+                    "review destination normalization"
+                )
 
         trains[
             train_id

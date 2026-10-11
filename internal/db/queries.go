@@ -10,6 +10,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// GetStationsByLine lists only lines operating at least four distinct
+// board-visible trains at the station during the loaded service day.
 func GetStationsByLine(
 	ctx context.Context,
 	pool *pgxpool.Pool,
@@ -30,6 +32,18 @@ func GetStationsByLine(
 			ON sl.line_id = l.id
 		JOIN stations s
 			ON s.code = sl.station_id
+		-- Only advertise regular station-line services. A line with
+		-- 1 to 3 distinct board-visible trains in the service day
+		-- remains in the timetable, but is not a selectable line.
+		JOIN (
+			SELECT station_id, line_id
+			FROM stop_times
+			WHERE board_visible = TRUE
+			GROUP BY station_id, line_id
+			HAVING COUNT(DISTINCT train_id) >= 4
+		) active_lines
+			ON active_lines.station_id = sl.station_id
+			AND active_lines.line_id = sl.line_id
 		WHERE s.selectable = TRUE
 		GROUP BY
 			l.id,
@@ -101,6 +115,7 @@ func GetStationsByLine(
 // GetArrivals returns the 5 nearest departures at a station. When line is
 // non-empty (a lines.ka_name) only that line is considered, so the 5 rows
 // are the 5 nearest of that line rather than a slice of the mixed board.
+// Irregular station-line pairs with fewer than four daily services are hidden.
 func GetArrivals(
 	ctx context.Context,
 	pool *pgxpool.Pool,
@@ -124,6 +139,15 @@ func GetArrivals(
 			ts.name AS dest_name,
 			vs.code AS via_name
 		FROM stop_times st
+		JOIN (
+			SELECT line_id
+			FROM stop_times
+			WHERE station_id = $1
+			  AND board_visible = TRUE
+			GROUP BY line_id
+			HAVING COUNT(DISTINCT train_id) >= 4
+		) active_lines
+			ON active_lines.line_id = st.line_id
 		JOIN lines l
 			ON l.id = st.line_id
 		JOIN dest_map dm
@@ -177,6 +201,9 @@ func GetArrivals(
 	)
 }
 
+// GetArrivalsGrouped returns up to five upcoming trains per line/destination.
+// Line/destination ranking is separate so routes sharing a terminal do not
+// consume each other's five slots. Irregular station-line pairs are hidden.
 func GetArrivalsGrouped(
 	ctx context.Context,
 	pool *pgxpool.Pool,
@@ -184,6 +211,14 @@ func GetArrivalsGrouped(
 	currentSort int,
 ) ([]model.ArrivalGroup, error) {
 	query := `
+		WITH active_lines AS (
+			SELECT line_id
+			FROM stop_times
+			WHERE station_id = $1
+			  AND board_visible = TRUE
+			GROUP BY line_id
+			HAVING COUNT(DISTINCT train_id) >= 4
+		)
 		SELECT
 			st.raw_dest,
 			ts.name AS dest_name,
@@ -201,15 +236,17 @@ func GetArrivalsGrouped(
 			) AS next_trains
 		FROM (
 			SELECT
-				*,
+				st.*,
 				ROW_NUMBER() OVER (
-					PARTITION BY raw_dest
-					ORDER BY arrival_sort
+					PARTITION BY st.line_id, st.raw_dest
+					ORDER BY st.arrival_sort
 				) AS rn
-			FROM stop_times
-			WHERE station_id = $1
-			  AND board_visible = TRUE
-			  AND arrival_sort > $2
+			FROM stop_times st
+			JOIN active_lines
+				ON active_lines.line_id = st.line_id
+			WHERE st.station_id = $1
+			  AND st.board_visible = TRUE
+			  AND st.arrival_sort > $2
 		) st
 		JOIN lines l
 			ON l.id = st.line_id
@@ -219,7 +256,7 @@ func GetArrivalsGrouped(
 			ON ts.code = dm.terminal_station_id
 		LEFT JOIN stations vs
 			ON vs.code = dm.via_station_id
-		WHERE st.rn <= 3
+		WHERE st.rn <= 5
 		GROUP BY
 			st.raw_dest,
 			dm.terminal_station_id,

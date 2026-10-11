@@ -59,6 +59,16 @@ func (s *Server) routes() {
 	)
 
 	s.mux.HandleFunc(
+		"GET /api/stations/{id}/cues",
+		s.wrap(s.handleStationCues),
+	)
+
+	s.mux.HandleFunc(
+		"GET /api/stations/{id}/trains/{train}/route",
+		s.wrap(s.handleTrainRoute),
+	)
+
+	s.mux.HandleFunc(
 		"GET /api/trip",
 		s.wrap(s.handleTrip),
 	)

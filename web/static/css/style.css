@@ -1,652 +1,170 @@
-/* ==========================================================
-   FONT: Helvetica Neue
-   Served from web/static/font/helvetica-neue-5/
-   ========================================================== */
-
-@font-face { font-family: "Helvetica Neue"; font-weight: 300; font-display: swap;
-  src: url("/font/helvetica-neue-5/HelveticaNeueLight.otf") format("opentype"); }
-@font-face { font-family: "Helvetica Neue"; font-weight: 400; font-display: swap;
-  src: url("/font/helvetica-neue-5/HelveticaNeueRoman.otf") format("opentype"); }
-@font-face { font-family: "Helvetica Neue"; font-weight: 500; font-display: swap;
-  src: url("/font/helvetica-neue-5/HelveticaNeueMedium.otf") format("opentype"); }
-@font-face { font-family: "Helvetica Neue"; font-weight: 700; font-display: swap;
-  src: url("/font/helvetica-neue-5/HelveticaNeueBold.otf") format("opentype"); }
-@font-face { font-family: "Helvetica Neue"; font-weight: 800; font-display: swap;
-  src: url("/font/helvetica-neue-5/HelveticaNeueHeavy.otf") format("opentype"); }
-@font-face { font-family: "Helvetica Neue"; font-weight: 900; font-display: swap;
-  src: url("/font/helvetica-neue-5/HelveticaNeueBlack.otf") format("opentype"); }
-
-
-/* ==========================================================
-   TOKENS
-   The design is drawn on a 390px-wide phone, where 1 unit = 1px.
-   --u scales that drawing with the viewport (floor 0.9, cap 1.75),
-   so every size keeps its proportion on every screen.
-   Write sizes as calc(N * var(--u)).
-   ========================================================== */
-
-:root {
-  --u: clamp(0.9px, calc(100vw / 390), 1.75px);
-
-  --page: #ecece8;
-  --paper: #ffffff;
-  --row: #f8f8f5;
-
-  --ink: #0d0d0c;
-  --muted: #74746f;
-  --muted-dark: #55554f;
-  --faint: #8a8984;
-
-  --rule: #d6d6d2;
-  --rule-heavy: #11110f;
-
-  --rail-color: #dd3434;
-  --urgent: #d93232;
-  --soon: #2f8a1f;
-
-  /* layout */
-  --max-width: 740px;
-  --rail: calc(5 * var(--u));
-  --gutter: calc(20 * var(--u));
-  --col-gap: calc(12 * var(--u));
-
-  /* line badges */
-  --badge: calc(25 * var(--u));
-  --badge-gap: calc(6 * var(--u));
-  --badge-col: calc(var(--badge) * 2.4);
-
-  /* type */
-  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --w-dest: 700;
-}
-
-
-/* ==========================================================
-   BASE
-   ========================================================== */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  background: var(--page);
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  margin: 0;
-  min-height: 100dvh;
-
-  /* keep content clear of notches in landscape (viewport-fit=cover) */
-  padding-inline:
-    env(safe-area-inset-left, 0px)
-    env(safe-area-inset-right, 0px);
-
-  background: var(--page);
-  color: var(--ink);
-  font-family: var(--font);
-
-  -webkit-font-smoothing: antialiased;
-  text-rendering: geometricPrecision;
-}
-
-button,
-input {
-  font: inherit;
-}
-
-button {
-  color: inherit;
-}
-
-h1,
-h2,
-p {
-  margin: 0;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: -2px;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-
-/* Trim every text box to cap-height / baseline. Centring then follows
-   the actual letter shapes instead of the font's built-in ascent and
-   descent, which is what made badges and labels sit a few px off. */
-.brand, .brand-subtitle, .header-clock, .section-label,
-.result-name, .back-label, .station-title, .board-subtitle,
-.board-columns span, .arrival-dest, .arrival-via,
-.countdown, .abs-time, .board-footer, .no-data, .line-letter {
-  text-box: trim-both cap alphabetic;
-}
-
-
-/* ==========================================================
-   FRAME
-   The red rail is the shell's own left border: full height,
-   no fixed positioning, no extra element.
-   ========================================================== */
-
-.app-shell {
-  width: min(100%, var(--max-width));
-  min-height: 100dvh;
-  margin-inline: auto;
-
-  background: var(--paper);
-  border-left: var(--rail) solid var(--rail-color);
-}
-
-/* Column so the board footer can sit at the bottom of the screen. */
-.screen {
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* The only place horizontal page padding is defined. */
-.gutter {
-  padding-inline: var(--gutter);
-}
-
-.major-rule {
-  height: calc(3 * var(--u));
-  margin-inline: var(--gutter);
-  background: var(--rule-heavy);
-}
-
-
-/* ==========================================================
-   LINE BADGES
-   ========================================================== */
-
-.line-circle {
-  display: inline-grid;
-  place-items: center;
-
-  flex: none;
-  width: var(--badge);
-  height: var(--badge);
-
-  border-radius: 50%;
-  color: #fff;
-
-  font-size: calc(var(--badge) * 0.46);
-  font-weight: 800;
-  line-height: 1;
-}
-
-.badges {
-  display: flex;
-  align-items: center;
-}
-
-.badges > * + * {
-  margin-left: var(--badge-gap);
-}
-
-/* 3+ lines: overlap so the group never outgrows --badge-col.
-   --n (badge count) is set from JS. */
-.badges[data-dense] > * + * {
-  margin-left: calc(
-    (var(--badge-col) - var(--badge)) / (var(--n) - 1) - var(--badge)
-  );
-}
-
-.badges[data-dense] .line-circle {
-  box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--paper);
-}
-
-
-/* ==========================================================
-   HOME
-   ========================================================== */
-
-.home-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--col-gap);
-
-  padding-block: calc(40 * var(--u)) calc(24 * var(--u));
-}
-
-.brand {
-  font-size: calc(32 * var(--u));
-  font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-}
-
-.brand-subtitle {
-  margin-top: calc(12 * var(--u));
-
-  color: var(--muted-dark);
-  font-size: calc(11 * var(--u));
-  font-weight: 500;
-  letter-spacing: 0.3em;
-}
-
-.header-clock {
-  color: var(--muted-dark);
-  font-size: calc(14 * var(--u));
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-}
-
-
-/* ==========================================================
-   SEARCH + RECENTS
-   ========================================================== */
-
-.search-wrap {
-  margin-top: calc(24 * var(--u));
-}
-
-#search {
-  appearance: none;
-
-  width: 100%;
-  height: calc(52 * var(--u));
-  padding-inline: calc(18 * var(--u));
-
-  border: 2px solid #deded9;
-  border-radius: 0;
-  outline: none;
-
-  background: #fafaf8;
-  color: var(--ink);
-
-  /* never below 16px, or iOS zooms the page on focus */
-  font-size: max(16px, calc(14 * var(--u)));
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-#search::placeholder {
-  color: var(--faint);
-  opacity: 1;
-}
-
-#search:focus {
-  border-color: var(--ink);
-  background: var(--paper);
-}
-
-.recents {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  margin-top: 12px;
-}
-
-.recents:empty {
-  display: none;
-}
-
-.recent-chip {
-  min-height: 36px;
-  padding: 0 14px;
-
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-
-  background: var(--paper);
-  color: var(--muted-dark);
-
-  font-size: calc(10 * var(--u));
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-
-  cursor: pointer;
-}
-
-.recent-chip:active {
-  transform: translateY(1px);
-}
-
-.section-label {
-  margin-block: calc(28 * var(--u)) calc(10 * var(--u));
-
-  color: var(--faint);
-  font-size: calc(10 * var(--u));
-  font-weight: 800;
-  letter-spacing: 0.35em;
-}
-
-
-/* ==========================================================
-   STATION LIST
-   columns: [badges] [name] [chevron]
-   ========================================================== */
-
-.result-row {
-  display: grid;
-  grid-template-columns: var(--badge-col) minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: var(--col-gap);
-
-  min-height: calc(64 * var(--u));
-  padding: calc(10 * var(--u)) var(--gutter);
-
-  border-bottom: 1px solid var(--rule);
-  background: var(--paper);
-  cursor: pointer;
-}
-
-.result-row:active {
-  background: #eeeeea;
-}
-
-.result-row .badges {
-  width: var(--badge-col);
-}
-
-.result-name {
-  overflow-wrap: anywhere;
-
-  font-size: calc(15 * var(--u));
-  font-weight: var(--w-dest);
-  line-height: 1.25;
-  letter-spacing: 0.02em;
-}
-
-.result-arrow {
-  display: block;
-  width: calc(7 * var(--u));
-  height: calc(12 * var(--u));
-  color: var(--faint);
-}
-
-
-/* ==========================================================
-   BOARD HEADER
-   ========================================================== */
-
-.board-header {
-  /* back-button centre sits 31.6 units from the top (44px touch target) */
-  padding-block:
-    max(4px, calc(31.6 * var(--u) - 22px))
-    calc(18 * var(--u));
-}
-
-.back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(11 * var(--u));
-
-  min-height: 44px;
-  /* title cap-top lands 59.5 units from the top */
-  margin: 0 0 max(0px, calc(27.9 * var(--u) - 22px));
-  padding: 0;
-
-  border: 0;
-  background: transparent;
-  color: var(--muted-dark);
-
-  font-size: calc(11 * var(--u));
-  font-weight: 700;
-  letter-spacing: 0.2em;
-
-  cursor: pointer;
-}
-
-.back-arrow {
-  display: block;
-  flex: none;
-  width: calc(17 * var(--u));
-  height: calc(10 * var(--u));
-}
-
-.station-title {
-  font-size: calc(26 * var(--u));
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-  overflow-wrap: anywhere;
-}
-
-.board-header .badges {
-  gap: var(--badge-gap);
-  margin-top: calc(10 * var(--u));
-}
-
-.board-header .badges > * + * {
-  margin-left: 0;
-}
-
-/* ---- line filter toggles ---- */
-
-.line-toggle {
-  position: relative;
-  display: block;
-  padding: 0;
-
-  border: 0;
-  border-radius: 50%;
-  background: none;
-
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* grow the hit area to ~44px without changing the layout */
-.line-toggle::after {
-  content: "";
-  position: absolute;
-  inset: -9px -3px;
-}
-
-.line-toggle .line-circle {
-  transition: opacity 150ms ease, filter 150ms ease, box-shadow 150ms ease;
-}
-
-/* a filter is active: unselected lines go grey, selected gets a ring */
-.badges[data-filtering] .line-toggle[aria-pressed="false"] .line-circle {
-  filter: grayscale(1);
-  opacity: 0.3;
-}
-
-.line-toggle[aria-pressed="true"] .line-circle {
-  box-shadow:
-    0 0 0 calc(1.5 * var(--u)) var(--paper),
-    0 0 0 calc(3 * var(--u)) var(--ink);
-}
-
-.line-toggle:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: calc(2 * var(--u));
-}
-
-.board-subtitle {
-  margin-top: calc(6 * var(--u));
-
-  color: var(--muted-dark);
-  font-size: calc(12 * var(--u));
-  letter-spacing: 0.04em;
-}
-
-#board-clock {
-  font-variant-numeric: tabular-nums;
-}
-
-
-/* ==========================================================
-   DEPARTURES
-   One column template shared by the table head and every row:
-   [badge] [destination / via] [countdown / clock time]
-   ========================================================== */
-
-.arrival-grid {
-  display: grid;
-  grid-template-columns: var(--badge) minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: var(--col-gap);
-
-  padding-inline: var(--gutter);
-}
-
-.board-columns {
-  min-height: calc(30 * var(--u));
-
-  border-bottom: 1px solid var(--rule);
-  background: var(--row);
-  color: var(--faint);
-
-  font-size: calc(10 * var(--u));
-  font-weight: 800;
-  letter-spacing: 0.25em;
-  white-space: nowrap;
-}
-
-.board-columns span:last-child {
-  text-align: right;
-  margin-right: -0.25em; /* cancel trailing letter-spacing: flush right edge */
-}
-
-.arrival-row {
-  min-height: calc(72 * var(--u));
-  padding-block: calc(10 * var(--u));
-
-  border-bottom: 1px solid var(--rule);
-  background: var(--row);
-}
-
-/* alternating rows, as in the original design */
-.arrival-row:nth-child(even) {
-  background: var(--paper);
-}
-
-.arrival-dest {
-  overflow-wrap: anywhere;
-
-  font-size: calc(15 * var(--u));
-  font-weight: var(--w-dest);
-  line-height: 1.25;
-  letter-spacing: 0.02em;
-}
-
-.arrival-via {
-  margin-top: calc(6 * var(--u));
-
-  color: var(--muted);
-  font-size: calc(10 * var(--u));
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.arrival-right {
-  text-align: right;
-}
-
-.countdown {
-  color: var(--ink);
-  font-size: calc(23 * var(--u));
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.countdown.urgent {
-  color: var(--urgent);
-}
-
-.countdown.soon {
-  color: var(--soon);
-}
-
-.abs-time {
-  margin-top: calc(9 * var(--u));
-  margin-right: -0.05em;
-
-  color: var(--faint);
-  font-size: calc(12 * var(--u));
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  font-variant-numeric: tabular-nums;
-}
-
-
-/* ==========================================================
-   STATES + FOOTER
-   ========================================================== */
-
-.no-data {
-  padding: calc(40 * var(--u)) var(--gutter);
-
-  border-bottom: 1px solid var(--rule);
-  background: var(--row);
-  color: var(--muted);
-
-  text-align: center;
-  font-size: calc(12 * var(--u));
-  font-weight: 700;
-  letter-spacing: 0.06em;
-}
-
-.board-footer {
-  margin-top: auto;
-  padding-block: calc(14 * var(--u));
-
-  border-top: 1px solid var(--rule);
-  background: var(--row);
-  color: var(--faint);
-
-  font-size: calc(11 * var(--u));
-  letter-spacing: 0.05em;
-}
-
-
-/* ==========================================================
-   INTERACTION + DESKTOP
-   ========================================================== */
-
-@media (hover: hover) {
-  .result-row:hover {
-    background: #f6f6f2;
-  }
-
-  .recent-chip:hover {
-    border-color: var(--ink);
-    color: var(--ink);
-  }
-
-  .back-button:hover {
-    color: var(--ink);
-  }
-}
-
-@media (min-width: 741px) {
-  .app-shell {
-    box-shadow:
-      0 0 0 1px rgba(0, 0, 0, 0.06),
-      0 24px 70px rgba(0, 0, 0, 0.08);
-  }
+/* Use the local font assets already present in Kommute; never embed redistributable binaries. */
+@font-face{font-family:"Helvetica Neue";font-weight:500;font-display:swap;src:url("/font/helvetica-neue-5/HelveticaNeueMedium.otf") format("opentype")}
+@font-face{font-family:"Helvetica Neue";font-weight:700;font-display:swap;src:url("/font/helvetica-neue-5/HelveticaNeueBold.otf") format("opentype")}
+@font-face{font-family:"Helvetica Neue";font-weight:800;font-display:swap;src:url("/font/helvetica-neue-5/HelveticaNeueHeavy.otf") format("opentype")}
+@font-face{font-family:"Helvetica Neue";font-weight:900;font-display:swap;src:url("/font/helvetica-neue-5/HelveticaNeueBlack.otf") format("opentype")}
+
+
+
+[hidden]{display:none!important}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{margin:0;padding:0;box-sizing:border-box}
+button,select,input{font-family:inherit}
+button{cursor:pointer}
+body{background:#faf9f5;color:#0d0d0c;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid #11110f;outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.app{width:100%;max-width:390px;margin-inline:auto;background:#fff;min-height:100dvh}
+.screen{width:100%;min-height:100dvh;background:#fff;border-left:5px solid #dd3434}
+.top{padding:9px 20px 18px}
+.back{display:flex;align-items:center;gap:11px;height:44px;border:0;background:none;color:#55554f;font:700 11px "Helvetica Neue",Helvetica,sans-serif;letter-spacing:.2em}
+h1{margin-top:2px;font-size:26px;line-height:1.1;font-weight:900;letter-spacing:-.02em;text-transform:uppercase}
+.badges{display:flex;gap:6px;margin-top:10px}
+.bd{width:25px;height:25px;border:0;border-radius:50%;color:#fff;font:800 11px/1 "Helvetica Neue",Helvetica,sans-serif;display:grid;place-items:center;transition:opacity .15s}
+.bd.dim{opacity:.3}
+.rule{height:3px;background:#11110f;margin:0 20px}
+.dirs{padding:12px 20px 14px}
+.dh{display:flex;justify-content:space-between;align-items:center;height:20px;margin-bottom:8px;font-size:10px;font-weight:800;letter-spacing:.2em;color:#6f6e69}
+.clear{border:0;background:none;padding:2px 0;font:700 11px "Helvetica Neue",Helvetica,sans-serif;letter-spacing:.04em;color:#0d0d0c;text-decoration:underline;text-underline-offset:3px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chip{display:flex;align-items:center;gap:9px;min-height:42px;min-width:0;padding:6px 12px;border:0;border-radius:10px;background:#f3f3ef;color:#0d0d0c;text-align:left}
+.chip.wide{grid-column:1/-1}
+.chip .sb{width:20px;height:20px;border-radius:50%;color:#fff;font:800 11px/1 "Helvetica Neue",Helvetica,sans-serif;display:grid;place-items:center;flex:none}
+.chip>span:last-child{min-width:0;flex:1}
+.chip .cn{display:block;font-size:12px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip .cv{display:block;margin-top:2px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#6f6e69}
+.chip.on{color:#fff}.chip.on .cv{color:rgba(255,255,255,.85)}
+.cols{display:flex;justify-content:space-between;align-items:center;height:32px;padding:0 20px;background:#f8f8f5;border-top:1px solid #d6d6d2;border-bottom:1px solid #d6d6d2;font-size:10px;font-weight:800;letter-spacing:.2em;color:#6f6e69}
+.row{display:flex;align-items:center;justify-content:space-between;min-height:74px;padding:11px 20px}
+.item{border-bottom:1px solid #d6d6d2}
+.mid,.xp,.dcols{display:none}
+.item:nth-child(odd){background:#f8f8f5}
+.row .l{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+.row .sb{width:30px;height:30px;border-radius:50%;color:#fff;font:800 12px/1 "Helvetica Neue",Helvetica,sans-serif;display:grid;place-items:center;flex:none}
+.dest{font-size:15px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;min-width:0}
+.dest small{display:block;margin-top:4px;font-size:10px;font-weight:700;letter-spacing:.06em;color:#6f6e69}
+.pill{display:block;width:max-content;max-width:100%;margin-top:5px;padding:3px 8px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.08em;line-height:1.2;white-space:nowrap}
+.pill.last{background:#11110f;color:#fff}
+.pill.next{background:#fff;border:1px solid #bdbdb7;color:#55554f}
+.r{text-align:right;flex:none}
+.cd{font-size:22px;font-weight:900;letter-spacing:-.01em;line-height:1;white-space:nowrap}
+.cd.now{color:#d93232}
+.ck{margin-top:6px;font-size:12px;font-weight:700;letter-spacing:.04em;color:#6f6e69}
+.none{padding:30px 20px;font-size:15px;font-weight:800;letter-spacing:.02em}
+.none span{display:block;margin-top:6px;font-size:12px;font-weight:700;color:#6f6e69}
+.empty{padding:32px 20px;text-align:center;color:#74746f;font-size:13px;font-weight:700}
+.board-footer{margin-top:auto;padding:14px 20px;border-top:1px solid #d6d6d2;background:#f8f8f5;color:#8a8984;font-size:11px;letter-spacing:.05em}
+#board{display:flex;flex-direction:column}
+#list{flex:1}
+.home-top{padding:40px 20px 24px}
+.home-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.brand{margin:0;font-size:32px;font-weight:900;letter-spacing:-.03em;line-height:.95}
+.brand button{border:0;background:none;padding:0;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit}
+.home-subtitle{font-size:11px;font-weight:500;letter-spacing:.3em;color:#55554f;margin-top:12px}
+#tsel{appearance:none;border:0;background:none;padding:4px 0;color:#55554f;font-size:14px;font-weight:700;letter-spacing:.1em;text-align:right;cursor:pointer}
+.search-wrap{padding:24px 20px 0}
+#search{appearance:none;width:100%;height:52px;padding:0 18px;border:2px solid #deded9;border-radius:0;background:#fafaf8;color:#0d0d0c;font-size:16px;font-weight:700;letter-spacing:.08em}
+#search::placeholder{color:#8a8984;opacity:1}
+#search:focus{outline:none;border-color:#0d0d0c;background:#fff}
+.recents{display:flex;flex-wrap:wrap;gap:8px;padding:12px 20px 0}
+.recents:empty{display:none}
+.recent-chip{min-height:36px;padding:0 14px;border:1px solid #d6d6d2;border-radius:999px;background:#fff;color:#55554f;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.section-label{padding:28px 20px 10px;color:#8a8984;font-size:10px;font-weight:800;letter-spacing:.35em}
+.station-row{display:grid;grid-template-columns:60px minmax(0,1fr) 12px;align-items:center;gap:12px;min-height:64px;padding:10px 20px;border:0;border-bottom:1px solid #d6d6d2;width:100%;background:#fff;text-align:left;color:#0d0d0c}
+.station-badges{display:flex;align-items:center;width:60px}
+.station-badges .sb{width:25px;height:25px;border-radius:50%;flex:none;color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px}
+.station-badges .sb+.sb{margin-left:6px}
+.station-badges.dense .sb+.sb{margin-left:-11px;box-shadow:0 0 0 1px #fff}
+.station-name{font-weight:800;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.chevron{width:7px;height:12px;display:block;color:#8a8984}
+#idle{display:none}
+.idle-in{padding:44px 28px 40px}
+.kicker{font-size:11px;font-weight:700;letter-spacing:.3em;color:#55554f}
+.hero{margin-top:14px;font-size:30px;line-height:1.08;font-weight:900;letter-spacing:-.025em}
+.sub{margin-top:14px;font-size:13px;font-weight:500;line-height:1.5;color:#55554f}
+.map{margin-top:26px}
+.map svg{display:block;width:100%;height:auto;overflow:visible}
+.map g.n{cursor:pointer}
+.map g.n:hover text,.map g.n:focus-visible text{fill:#0d0d0c}
+.map text{font:700 11px "Helvetica Neue",Helvetica,sans-serif;letter-spacing:.06em;fill:#55554f;text-transform:uppercase}
+.legend{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;font-weight:500;letter-spacing:.03em;color:#6f6e69}
+.legend i{width:16px;height:16px;border-radius:50%;border:1px solid #11110f;display:grid;place-items:center}
+.legend i::after{content:"";width:8px;height:8px;border-radius:50%;border:2.5px solid #11110f;background:#fff}
+@media(hover:hover){.station-row:hover{background:#f6f6f2}.recent-chip:hover{border-color:#111}}
+@media(min-width:600px){.app{box-shadow:0 0 0 1px rgba(0,0,0,.05),0 24px 60px rgba(0,0,0,.07)}}
+@media(max-width:350px){.chip{padding-inline:8px;gap:6px}.chip .cn{font-size:11px}.cols{letter-spacing:.14em}}
+.split{flex:1;display:flex;flex-direction:column}
+.bcol{flex:1;display:flex;flex-direction:column}
+.route{display:none}
+@media(min-width:900px){
+  body{background:#fff}
+  .app{width:100%;max-width:none;margin:0;box-shadow:none;display:grid;grid-template-columns:340px minmax(0,1fr);align-items:start}
+  #picker{position:sticky;top:0;height:100dvh;overflow-y:auto;border-left:0;border-right:1px solid #e6e6e2}
+  .back{display:none}
+  .top{padding:26px 36px 20px}
+  h1#name{font-size:44px}
+  #board .rule{margin:0 36px}
+  .split{display:block}
+  .route{display:none!important}
+  .dirs{padding:20px 36px 18px}
+  .grid{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+  .chip.wide{grid-column:auto}
+  .cols{display:none}
+  .dcols{display:grid;grid-template-columns:minmax(200px,260px) minmax(0,1fr) 150px;gap:28px;align-items:center;height:34px;padding:0 36px;background:#f8f8f5;border-top:1px solid #d6d6d2;border-bottom:1px solid #d6d6d2;font-size:10px;font-weight:800;letter-spacing:.2em;color:#6f6e69}
+  .dcols span:last-child{text-align:right}
+  .row{display:grid;grid-template-columns:minmax(200px,260px) minmax(0,1fr) 150px;gap:28px;min-height:116px;padding:14px 36px;cursor:pointer}
+  .row:hover{background:rgba(0,0,0,.025)}
+  .item.open{background:#f3f3ef;box-shadow:inset 4px 0 0 #11110f}
+  .dest{font-size:20px}
+  .cd{font-size:34px}
+  .ck{font-size:13px}
+  .station-row[aria-current="true"]{background:#f3f3ef}
+  #board[hidden]+#idle{display:block;min-height:100dvh}
+  .idle-in{padding:64px 44px;max-width:760px}
+  .hero{font-size:46px}
+  .map{max-width:600px}
+  .mid{display:block}
+  .strip{display:grid;padding-top:14px}
+  .nd{position:relative;min-width:0;padding-top:30px;text-align:center}
+  .nd .ln{position:absolute;top:14px;height:4px;background:var(--c)}
+  .nd .ln.l{left:0;right:50%}
+  .nd .ln.r{left:50%;right:0}
+  .nd .ln.dash{background:repeating-linear-gradient(90deg,var(--c) 0 6px,transparent 6px 12px)}
+  .nd .dot{position:absolute;left:50%;top:10px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#fff;border:3px solid var(--c)}
+  .nd.key .dot{top:8px;width:16px;height:16px;margin-left:-8px;border-width:4px}
+  .nd.here .dot{background:#11110f;border-color:#11110f}
+  .nd .xf{position:absolute;top:-8px;width:14px;height:14px;border-radius:50%;color:#fff;font:800 8px/14px "Helvetica Neue",Helvetica,sans-serif;text-align:center}
+  .nd .nm{display:block;height:26px;overflow:hidden;padding:0 4px;font-size:10px;font-weight:700;letter-spacing:.03em;line-height:13px;text-transform:uppercase;color:#55554f}
+  .nd.key .nm{font-weight:900;color:#0d0d0c}
+  .nd.gap .nm{font-weight:800;letter-spacing:.08em;color:#6f6e69}
+  .nd .tm{display:block;margin-top:3px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#6f6e69}
+  .xp{display:block;padding:2px 36px 28px}
+  .xp h4{font-size:10px;font-weight:800;letter-spacing:.2em;color:#6f6e69;margin-bottom:10px}
+  .xl{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:0 36px}
+  .xl li{display:flex;align-items:center;gap:10px;min-height:36px;border-bottom:1px solid rgba(0,0,0,.07)}
+  .xl .d{width:11px;height:11px;border-radius:50%;border:3px solid var(--c);background:#fff;flex:none}
+  .xl .n{flex:1;font-size:13px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+  .xl li.end .n{font-weight:900}
+  .xl .tg{font-size:9px;font-weight:800;letter-spacing:.12em;color:#6f6e69}
+  .xl .xb{width:14px;height:14px;border-radius:50%;color:#fff;font:800 8px/14px "Helvetica Neue",Helvetica,sans-serif;text-align:center}
+  .xl .t{font-size:12px;font-weight:700;letter-spacing:.04em;color:#55554f;min-width:42px;text-align:right}
+}
+@media(min-width:900px) and (max-width:1279px){.mid{display:none}.row,.dcols{grid-template-columns:minmax(0,1fr) 150px}.dcols span:nth-child(2){display:none}}
+/* Production integration adjustments. */
+#home-clock{appearance:none;border:0;color:#55554f;font-size:14px;font-weight:700;letter-spacing:.1em;white-space:nowrap}
+.brand button{border:0;background:none;padding:0;color:inherit;font:inherit;letter-spacing:inherit}
+.row .l{align-self:center}
+.row .dest{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .dest small{white-space:normal}
+.map g.n:focus-visible{outline:0}
+.map g.n:focus-visible circle{stroke-width:5px}
+@media(min-width:900px){
+  #picker{display:flex;flex-direction:column}
+  #idle:not([hidden]){display:block}
+  #board{border-left:0!important}
+}
+@media(max-width:899px){
+  #idle{display:none!important}
+  .app{max-width:390px}
 }

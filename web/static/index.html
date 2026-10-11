@@ -1,88 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#ecece8">
+  <meta name="theme-color" content="#faf9f5">
   <title>Kommute — KRL Jabodetabek</title>
-  <link rel="preload" as="font" type="font/otf" crossorigin href="/font/helvetica-neue-5/HelveticaNeueBlack.otf">
-  <link rel="preload" as="font" type="font/otf" crossorigin href="/font/helvetica-neue-5/HelveticaNeueBold.otf">
-  <link rel="stylesheet" href="/css/style.css?v=7">
+  <link rel="stylesheet" href="/css/style.css?v=13">
+  <script defer src="/js/app.js?v=13"></script>
 </head>
-
 <body>
-  <div class="app-shell">
-    <main class="app">
-
-      <!-- Station picker -->
-      <section id="picker" class="screen">
-        <header class="home-header gutter">
+  <main class="app">
+    <section class="screen" id="picker" aria-label="Station picker">
+      <header class="home-top">
+        <div class="home-heading">
           <div>
-            <h1 class="brand">KOMMUTE</h1>
-            <p class="brand-subtitle">KRL JABODETABEK</p>
+            <h1 class="brand"><button type="button" id="home">KOMMUTE</button></h1>
+            <p class="home-subtitle">KRL JABODETABEK</p>
           </div>
-          <time id="home-clock" class="header-clock" aria-label="Jakarta time">--:--</time>
-        </header>
-
-        <div class="major-rule"></div>
-
-        <div class="search-wrap gutter">
-          <label class="sr-only" for="search">Search station</label>
-          <input
-            type="search"
-            id="search"
-            placeholder="SEARCH STATION"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-          >
+          <time id="home-clock" aria-label="Jakarta time">--:--</time>
         </div>
+      </header>
+      <div class="rule"></div>
+      <div class="search-wrap">
+        <label for="search" class="sr-only">Search station</label>
+        <input id="search" type="search" placeholder="SEARCH STATION" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div id="recents" class="recents"></div>
+      <h2 class="section-label" id="station-list-label">ALL STATIONS</h2>
+      <div id="results" aria-live="polite"></div>
+    </section>
 
-        <div id="recents" class="recents gutter"></div>
-
-        <h2 id="station-list-label" class="section-label gutter">ALL STATIONS</h2>
-
-        <div id="results" class="station-list" aria-live="polite"></div>
-      </section>
-
-      <!-- Departure board -->
-      <section id="board" class="screen" hidden>
-        <header class="board-header gutter">
-          <button id="back-btn" class="back-button" type="button">
-            <svg class="back-arrow" viewBox="0 0 17 10" fill="none" stroke="currentColor"
-                 stroke-width="1.1" aria-hidden="true">
-              <path d="M17 5H1M5.5 .8 1 5l4.5 4.2"/>
-            </svg>
-            <span class="back-label">STATIONS</span>
-          </button>
-
-          <h2 id="station-name" class="station-title">STATION</h2>
-          <div id="station-lines" class="badges"></div>
-
-          <p class="board-subtitle">
-            Next departures as of <time id="board-clock">--:--</time>
-          </p>
-        </header>
-
-        <div class="major-rule"></div>
-
-        <div class="arrival-grid board-columns" aria-hidden="true">
-          <span>LINE</span>
-          <span>DESTINATION</span>
-          <span>DEPARTS</span>
+    <section id="board" class="screen" aria-label="Departure board" hidden>
+      <header class="top">
+        <button class="back" id="back" type="button">
+          <svg aria-hidden="true" width="17" height="10" viewBox="0 0 17 10" fill="none" stroke="currentColor" stroke-width="1.1"><path d="M17 5H1M5.5 .8 1 5l4.5 4.2"/></svg>
+          STATIONS
+        </button>
+        <h1 id="name"></h1>
+        <div id="badges" class="badges" aria-label="Station lines"></div>
+      </header>
+      <div class="rule"></div>
+      <div class="split">
+        <div class="bcol">
+          <div id="dirs" class="dirs" hidden>
+            <div class="dh">
+              <span>TOWARD</span>
+              <button id="clear" class="clear" type="button" hidden>Show all</button>
+            </div>
+            <div id="grid" class="grid"></div>
+          </div>
+          <div class="cols" aria-hidden="true"><span>LINE DESTINATION</span><span>DEPARTS</span></div>
+          <div class="dcols" aria-hidden="true">
+            <span>DESTINATION</span><span>YOU ARE HERE, THEN THE NEXT STOPS</span><span>LEAVES IN</span>
+          </div>
+          <div id="list" aria-live="polite"></div>
+          <footer class="board-footer">Scheduled times — actual arrivals may differ</footer>
         </div>
+      </div>
+    </section>
 
-        <div id="arrivals" class="arrival-list" aria-live="polite"></div>
-
-        <footer class="board-footer gutter">
-          Scheduled times — actual arrivals may differ
-        </footer>
-      </section>
-
-    </main>
-  </div>
-
-  <script src="/js/app.js?v=8"></script>
+    <section id="idle" aria-label="Network overview" hidden>
+      <div class="idle-in">
+        <p class="kicker">KOMMUTE</p>
+        <h2 class="hero">The next train,<br>from where you stand.</h2>
+        <p class="sub">Pick a station on the left, or select one on the map.</p>
+        <div id="map" class="map" aria-label="Schematic rail network"></div>
+        <p class="legend"><i aria-hidden="true"></i> Fork: choose a direction here</p>
+      </div>
+    </section>
+  </main>
 </body>
 </html>

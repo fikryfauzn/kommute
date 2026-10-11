@@ -21,7 +21,7 @@ func (s *Server) handleStations(
 
 	w.Header().Set(
 		"Cache-Control",
-		"public, max-age=86400",
+		"public, max-age=300",
 	)
 
 	writeJSON(
